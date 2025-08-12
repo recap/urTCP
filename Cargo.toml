@@ -6,8 +6,9 @@ license = "Apache-2.0"
 description = "A Rust library for user level TCP stack."
 
 [dependencies]
+bytes = "1.10.1"
 thiserror = "2.0.14"
-tokio = { version = "1.47.1", features = ["macros", "time", "sync", "rt-multi-thread"] }
+tokio = { version = "1.47.1", features = ["macros", "time", "sync", "rt-multi-thread", "net"] }
 tracing = "0.1.41"
 tracing-subscriber = { version = "0.3.19", features = ["fmt", "env-filter"] }
 tun = { version = "0.8.3", optional = true }
