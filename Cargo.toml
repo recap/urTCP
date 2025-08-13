@@ -1,11 +1,12 @@
 [package]
-name = "urTCP"
+name = "urtcp"
 version = "0.1.0"
 edition = "2024"
 license = "Apache-2.0"
 description = "A Rust library for user level TCP stack."
 
 [dependencies]
+async-trait = "0.1.88"
 bytes = "1.10.1"
 thiserror = "2.0.14"
 tokio = { version = "1.47.1", features = ["macros", "time", "sync", "rt-multi-thread", "net"] }
