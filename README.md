@@ -2,4 +2,5 @@
 
 A user level TCP stack library written in Rust
 
-> [!WARNING] > **Under construction.** This package is not ready for use. Expect breaking changes and missing features.
+> [!WARNING]
+> **Under construction.** This package is not ready for use. Expect breaking changes and missing features.
