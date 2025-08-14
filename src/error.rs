@@ -1,7 +1,7 @@
 use thiserror::Error;
 
 #[derive(Error, Debug)]
-pub enum UtcpError {
+pub enum UrtcpError {
     #[error("device error: {0}")]
     Device(String),
     #[error("malformed packet")]
@@ -15,4 +15,4 @@ pub enum UtcpError {
     #[error("not implemented: {0}")]
     NotImplemented(&'static str),
 }
-pub type Result<T> = std::result::Result<T, UtcpError>;
+pub type Result<T> = std::result::Result<T, UrtcpError>;

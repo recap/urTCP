@@ -1,6 +1,5 @@
+use crate::error::{Result, UrtcpError};
 use bytes::BytesMut;
-
-use crate::error::Result;
 
 /// Abstract I/O for the L3 device (reads/writes raw IP frames).
 #[async_trait::async_trait]
@@ -46,19 +45,19 @@ impl NetDevice for LoopDevice {
     //     self.rx
     //         .recv()
     //         .await
-    //         .ok_or_else(|| crate::error::UtcpError::Device("rx closed".into()))
+    //         .ok_or_else(|| UrtcpError::Device("rx closed".into()))
     // }
     async fn recv(&self) -> Result<BytesMut> {
         let mut rx = self.rx.lock().await;
         rx.recv()
             .await
-            .ok_or_else(|| crate::error::UtcpError::Device("rx closed".into()))
+            .ok_or_else(|| UrtcpError::Device("rx closed".into()))
     }
     async fn send(&self, frame: &[u8]) -> Result<()> {
         self.tx
             .send(BytesMut::from(frame))
             .await
-            .map_err(|e| crate::error::UtcpError::Device(e.to_string()))
+            .map_err(|e| UrtcpError::Device(e.to_string()))
     }
     fn mtu(&self) -> usize {
         self.mtu
@@ -81,10 +80,9 @@ pub mod tun_backend {
             cfg.up();
             cfg.address((10, 0, 0, 1))
                 .netmask((255, 255, 255, 0))
-                .mtu(mtu as i32)
+                .mtu(mtu as u16)
                 .name(name);
-            let dev =
-                TunDev::new(&cfg).map_err(|e| crate::error::UtcpError::Device(e.to_string()))?;
+            let dev = TunDev::new(&cfg).map_err(|e| UrtcpError::Device(e.to_string()))?;
             Ok(Self { dev, mtu })
         }
     }
@@ -102,7 +100,8 @@ pub mod tun_backend {
                 Ok::<usize, std::io::Error>(0)
             })
             .await
-            .map_err(|e| crate::error::UtcpError::Device(e.to_string()))??;
+            .map_err(|e| UrtcpError::Device(format!("join error: {e}")))?
+            .map_err(|e| UrtcpError::Device(e.to_string()))?;
             buf.truncate(n);
             Ok(bytes::BytesMut::from(&buf[..]))
         }

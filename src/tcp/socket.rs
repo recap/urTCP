@@ -44,11 +44,11 @@ impl TcpStream {
         tx_cmd
             .send(TcpCmd::Connect(id, reply_tx))
             .await
-            .map_err(|_| UtcpError::Device("control channel".into()))?;
+            .map_err(|_| UrtcpError::Device("control channel".into()))?;
         timeout(Duration::from_secs(2), reply_rx)
             .await
-            .map_err(|_| UtcpError::Device("connect timeout".into()))?
-            .map_err(|_| UtcpError::Device("connect drop".into()))??;
+            .map_err(|_| UrtcpError::Device("connect timeout".into()))?
+            .map_err(|_| UrtcpError::Device("connect drop".into()))??;
 
         Ok(Self {
             id,
@@ -62,7 +62,7 @@ impl TcpStream {
         self.tx_cmd
             .send(TcpCmd::Send(self.id, data))
             .await
-            .map_err(|_| UtcpError::Device("control channel".into()))
+            .map_err(|_| UrtcpError::Device("control channel".into()))
     }
 
     pub async fn read(&mut self) -> Result<Option<Vec<u8>>> {
@@ -73,7 +73,7 @@ impl TcpStream {
         self.tx_cmd
             .send(TcpCmd::Close(self.id))
             .await
-            .map_err(|_| UtcpError::Device("control channel".into()))
+            .map_err(|_| UrtcpError::Device("control channel".into()))
     }
 }
 
@@ -83,10 +83,10 @@ impl TcpListener {
         tx_cmd
             .send(TcpCmd::Listen(local.port, reply_tx))
             .await
-            .map_err(|_| UtcpError::Device("control channel".into()))?;
+            .map_err(|_| UrtcpError::Device("control channel".into()))?;
         reply_rx
             .await
-            .map_err(|_| UtcpError::Device("listen drop".into()))??;
+            .map_err(|_| UrtcpError::Device("listen drop".into()))??;
         Ok(Self { local, tx_cmd })
     }
 

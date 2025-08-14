@@ -68,7 +68,7 @@ impl Connection {
     /// Handle an inbound TCP segment (without IP header).
     pub fn on_segment(&mut self, _seg: &[u8]) -> Result<()> {
         // parse header, update state machine, ack, push payload to app_rx
-        Err(UtcpError::NotImplemented("conn.on_segment"))
+        Err(UrtcpError::NotImplemented("conn.on_segment"))
     }
 
     /// Pull application data to send, make segments
@@ -80,7 +80,7 @@ impl Connection {
     /// Called by timer wheel on RTO
     pub fn on_retransmit_timeout(&mut self) -> Result<()> {
         // backoff, retransmit snd_una..snd_nxt
-        Err(UtcpError::NotImplemented("RTO"))
+        Err(UrtcpError::NotImplemented("RTO"))
     }
 }
 

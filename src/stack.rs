@@ -69,7 +69,7 @@ impl<D: NetDevice> Stack<D> {
         // Parse IPv4 + TCP, route to connection
         // NOTE: skeleton only
         let _ = frame;
-        Err(UtcpError::NotImplemented("parse ipv4/tcp"))
+        Err(UrtcpError::NotImplemented("parse ipv4/tcp"))
     }
 
     async fn on_cmd(&mut self, cmd: TcpCmd) -> Result<()> {
@@ -112,7 +112,7 @@ impl<D: NetDevice> Stack<D> {
                 if let Some(conn) = self.conns.get_mut(&id) {
                     let _ = conn.poll_send()?; // build segments (todo)
                 } else {
-                    return Err(UtcpError::ConnNotFound);
+                    return Err(UrtcpError::ConnNotFound);
                 }
             }
             TcpCmd::Close(id) => {

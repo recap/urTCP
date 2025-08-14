@@ -1,4 +1,4 @@
-use crate::error::{Result, UtcpError};
+use crate::error::{Result, UrtcpError};
 use bytes::{Buf, BufMut, BytesMut};
 
 pub const MAGIC: [u8; 4] = *b"uTCP";
@@ -32,15 +32,15 @@ impl TunnelHdr {
     }
     pub fn decode(mut buf: BytesMut) -> Result<(Self, BytesMut)> {
         if buf.len() < 12 {
-            return Err(UtcpError::Malformed);
+            return Err(UrtcpError::Malformed);
         }
         if &buf[..4] != MAGIC {
-            return Err(UtcpError::Malformed);
+            return Err(UrtcpError::Malformed);
         }
         let _ = buf.split_to(4);
         let ver = buf.get_u8();
         if ver != VERSION {
-            return Err(UtcpError::Malformed);
+            return Err(UrtcpError::Malformed);
         }
         let cid = buf.get_u32();
         let kind = match buf.get_u8() {
@@ -48,11 +48,11 @@ impl TunnelHdr {
             1 => Kind::Data,
             2 => Kind::Ping,
             3 => Kind::Pong,
-            _ => return Err(UtcpError::Malformed),
+            _ => return Err(UrtcpError::Malformed),
         };
         let len = buf.get_u16() as usize;
         if buf.len() < len {
-            return Err(UtcpError::Malformed);
+            return Err(UrtcpError::Malformed);
         }
         let payload = buf.split_to(len);
         Ok((Self { cid, kind }, payload))
