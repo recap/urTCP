@@ -67,23 +67,32 @@ impl NetDevice for LoopDevice {
 #[cfg(feature = "tun-backend")]
 pub mod tun_backend {
     use super::*;
-    use tun::{Configuration, Device as TunDev};
+    use tun::{AbstractDevice, Configuration, Device as TunDev};
 
     /// Minimal TUN wrapper (IPv4 only, for now).
     pub struct TunDevice {
         dev: TunDev,
         mtu: usize,
+        ifname: String,
     }
     impl TunDevice {
         pub fn new(name: &str, mtu: usize) -> Result<Self> {
             let mut cfg = Configuration::default();
-            cfg.up();
+            // cfg.up();
             cfg.address((10, 0, 0, 1))
                 .netmask((255, 255, 255, 0))
                 .mtu(mtu as u16)
-                .name(name);
-            let dev = TunDev::new(&cfg).map_err(|e| UrtcpError::Device(e.to_string()))?;
-            Ok(Self { dev, mtu })
+                .up();
+
+            let mut dev = tun::create(&cfg).map_err(|e| UrtcpError::Device(e.to_string()))?;
+            let ifname = dev
+                .tun_name()
+                .map_err(|e| UrtcpError::Device(e.to_string()))?;
+            Ok(Self { dev, mtu, ifname })
+        }
+
+        pub fn ifname(&self) -> &str {
+            &self.ifname
         }
     }
     #[async_trait::async_trait]
