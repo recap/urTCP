@@ -37,3 +37,41 @@ impl Ipv4Header {
         buf
     }
 }
+
+pub struct Ipv4View<'a> {
+    pub src: [u8; 4],
+    pub dst: [u8; 4],
+    pub proto: u8,
+    pub ihl_bytes: usize,
+    pub payload: &'a [u8],
+}
+
+pub fn parse_ipv4(frame: &[u8]) -> Option<Ipv4View<'_>> {
+    if frame.len() < 20 {
+        return None;
+    }
+    let ver_ihl = frame[0];
+    if ver_ihl >> 4 != 4 {
+        return None;
+    }
+    let ihl = (ver_ihl & 0x0f) as usize;
+    let ihl_bytes = ihl * 4;
+    if ihl_bytes < 20 || frame.len() < ihl_bytes {
+        return None;
+    }
+    let total_len = u16::from_be_bytes([frame[2], frame[3]]) as usize;
+    if total_len > frame.len() {
+        return None;
+    }
+    let proto = frame[9];
+    let src = [frame[12], frame[13], frame[14], frame[15]];
+    let dst = [frame[16], frame[17], frame[18], frame[19]];
+    let payload = &frame[ihl_bytes..total_len];
+    Some(Ipv4View {
+        src,
+        dst,
+        proto,
+        ihl_bytes,
+        payload,
+    })
+}
